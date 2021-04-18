@@ -268,6 +268,8 @@ func Register(e *v1alpha1.Edged) {
 		os.Exit(1)
 		return
 	}
+
+	edged.enable = true
 	core.Register(edged)
 }
 
