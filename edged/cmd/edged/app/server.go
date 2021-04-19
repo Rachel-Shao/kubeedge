@@ -7,7 +7,7 @@ import (
 	"github.com/kubeedge/kubeedge/common/constants"
 	"github.com/kubeedge/kubeedge/edged/cmd/edged/app/options"
 	"github.com/kubeedge/kubeedge/edged/pkg/client"
-	edged "github.com/kubeedge/kubeedge/edged/pkg/edged"
+	"github.com/kubeedge/kubeedge/edged/pkg/edged"
 	"github.com/kubeedge/kubeedge/pkg/apis/componentconfig/edged/v1alpha1"
 	"github.com/kubeedge/kubeedge/pkg/apis/componentconfig/edged/v1alpha1/validation"
 	"github.com/kubeedge/kubeedge/pkg/util"

@@ -366,8 +366,10 @@ func (e *edged) Start() {
 	e.logManager.Start()
 	stopChan := make(chan struct{})
 	e.runtimeClassManager.Start(stopChan)
-	klog.Infof("starting syncPod")
-	e.syncPod()
+	//klog.Infof("starting syncPod")
+	klog.Infof("[sxy]:starting syncPod1")
+	//e.syncPod()
+	e.syncPod1()
 }
 
 // isInitPodReady is used to safely return initPodReady flag
