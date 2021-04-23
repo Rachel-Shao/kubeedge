@@ -511,6 +511,15 @@ func (mh *MessageHandle) send(hi hubio.CloudHubIO, info *model.HubInfo, msg *bee
 	return nil
 }
 
+func IsExist(source []string, msgSource string) bool {
+	for _, s := range source {
+		if s == msgSource {
+			return true
+		}
+	}
+	return false
+}
+
 func (mh *MessageHandle) saveSuccessPoint(msg *beehiveModel.Message, info *model.HubInfo, nodeStore cache.Store) {
 	if msg.GetGroup() == edgeconst.GroupResource {
 		resourceNamespace, _ := edgemessagelayer.GetNamespace(*msg)
@@ -535,6 +544,12 @@ func (mh *MessageHandle) saveSuccessPoint(msg *beehiveModel.Message, info *model
 
 		objectSync, err := mh.crdClient.ReliablesyncsV1alpha1().ObjectSyncs(resourceNamespace).Get(context.Background(), objectSyncName, metav1.GetOptions{})
 		if err == nil {
+			// Update objectSync.Label
+			source := strings.Split(objectSync.Labels["source"], ",")
+			if !IsExist(source, msg.GetSource()) {
+				newLabel := strings.Join([]string{objectSync.Labels["source"], msg.GetSource()}, ",")
+				objectSync.Labels["source"] = newLabel
+			}
 			objectSync.Status.ObjectResourceVersion = msg.GetResourceVersion()
 			_, err := mh.crdClient.ReliablesyncsV1alpha1().ObjectSyncs(resourceNamespace).UpdateStatus(context.Background(), objectSync, metav1.UpdateOptions{})
 			if err != nil {
@@ -542,9 +557,13 @@ func (mh *MessageHandle) saveSuccessPoint(msg *beehiveModel.Message, info *model
 					err, resourceType, resourceNamespace, resourceName)
 			}
 		} else if err != nil && apierrors.IsNotFound(err) {
+			label := map[string]string{
+				"source": msg.GetSource(),
+			}
 			objectSync := &v1alpha1.ObjectSync{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: objectSyncName,
+					Name:   objectSyncName,
+					Labels: label,
 				},
 				Spec: v1alpha1.ObjectSyncSpec{
 					ObjectAPIVersion: util.GetMessageAPIVerison(msg),

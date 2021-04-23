@@ -113,7 +113,13 @@ func (q *ChannelMessageQueue) addMessageToQueue(nodeID string, msg *beehiveModel
 				return
 			}
 			objectSync, err := q.objectSyncLister.ObjectSyncs(resourceNamespace).Get(synccontroller.BuildObjectSyncName(nodeID, resourceUID))
-			if err == nil && objectSync.Status.ObjectResourceVersion != "" && synccontroller.CompareResourceVersion(msg.GetResourceVersion(), objectSync.Status.ObjectResourceVersion) <= 0 {
+			source := strings.Split(objectSync.Labels["source"], ",")
+			if err == nil && objectSync.Status.ObjectResourceVersion != "" && synccontroller.CompareResourceVersion(msg.GetResourceVersion(), objectSync.Status.ObjectResourceVersion) == 0 &&
+				IsExist(source, msg.GetSource()) {
+				return
+			}
+
+			if err == nil && objectSync.Status.ObjectResourceVersion != "" && synccontroller.CompareResourceVersion(msg.GetResourceVersion(), objectSync.Status.ObjectResourceVersion) < 0 {
 				return
 			}
 		}
@@ -121,7 +127,8 @@ func (q *ChannelMessageQueue) addMessageToQueue(nodeID string, msg *beehiveModel
 		// Check if message is older than already in store, if it is, discard it directly
 		if exist {
 			msgInStore := item.(*beehiveModel.Message)
-			if isDeleteMessage(msgInStore) || synccontroller.CompareResourceVersion(msg.GetResourceVersion(), msgInStore.GetResourceVersion()) <= 0 {
+			if isDeleteMessage(msgInStore) || synccontroller.CompareResourceVersion(msg.GetResourceVersion(), msgInStore.GetResourceVersion()) < 0 ||
+				synccontroller.CompareResourceVersion(msg.GetResourceVersion(), msgInStore.GetResourceVersion()) == 0 && msg.GetSource() == msgInStore.GetSource() {
 				return
 			}
 		}
@@ -132,6 +139,15 @@ func (q *ChannelMessageQueue) addMessageToQueue(nodeID string, msg *beehiveModel
 		return
 	}
 	nodeQueue.Add(messageKey)
+}
+
+func IsExist(source []string, msgSource string) bool {
+	for _, s := range source {
+		if s == msgSource {
+			return true
+		}
+	}
+	return false
 }
 
 func getMsgKey(obj interface{}) (string, error) {
