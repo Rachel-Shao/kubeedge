@@ -21,6 +21,7 @@ import (
 	edgemessagelayer "github.com/kubeedge/kubeedge/cloud/pkg/edgecontroller/messagelayer"
 	"github.com/kubeedge/kubeedge/cloud/pkg/synccontroller"
 	commonconst "github.com/kubeedge/kubeedge/common/constants"
+	"github.com/kubeedge/kubeedge/pkg/util"
 )
 
 // ChannelMessageQueue is the channel implementation of MessageQueue
@@ -113,14 +114,18 @@ func (q *ChannelMessageQueue) addMessageToQueue(nodeID string, msg *beehiveModel
 				return
 			}
 			objectSync, err := q.objectSyncLister.ObjectSyncs(resourceNamespace).Get(synccontroller.BuildObjectSyncName(nodeID, resourceUID))
-			source := strings.Split(objectSync.Labels["source"], ",")
-			if err == nil && objectSync.Status.ObjectResourceVersion != "" && synccontroller.CompareResourceVersion(msg.GetResourceVersion(), objectSync.Status.ObjectResourceVersion) == 0 &&
-				IsExist(source, msg.GetSource()) {
-				return
-			}
+			if err == nil && objectSync.Status.ObjectResourceVersion != "" {
+				cmpValue := synccontroller.CompareResourceVersion(msg.GetResourceVersion(), objectSync.Status.ObjectResourceVersion)
+				if cmpValue < 0 {
+					return
+				}
 
-			if err == nil && objectSync.Status.ObjectResourceVersion != "" && synccontroller.CompareResourceVersion(msg.GetResourceVersion(), objectSync.Status.ObjectResourceVersion) < 0 {
-				return
+				if cmpValue == 0 {
+					source := strings.Split(objectSync.Labels["source"], ",")
+					if util.IsExist(source, msg.GetSource()) {
+						return
+					}
+				}
 			}
 		}
 
@@ -139,15 +144,6 @@ func (q *ChannelMessageQueue) addMessageToQueue(nodeID string, msg *beehiveModel
 		return
 	}
 	nodeQueue.Add(messageKey)
-}
-
-func IsExist(source []string, msgSource string) bool {
-	for _, s := range source {
-		if s == msgSource {
-			return true
-		}
-	}
-	return false
 }
 
 func getMsgKey(obj interface{}) (string, error) {

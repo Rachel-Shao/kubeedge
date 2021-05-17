@@ -22,7 +22,8 @@ import (
 	edgectrconst "github.com/kubeedge/kubeedge/cloud/pkg/edgecontroller/constants"
 	edgectrmessagelayer "github.com/kubeedge/kubeedge/cloud/pkg/edgecontroller/messagelayer"
 	commonconst "github.com/kubeedge/kubeedge/common/constants"
-	"github.com/kubeedge/kubeedge/pkg/metaserver/util"
+	metautil "github.com/kubeedge/kubeedge/pkg/metaserver/util"
+	"github.com/kubeedge/kubeedge/pkg/util"
 )
 
 func (sctl *SyncController) manageObject(sync *v1alpha1.ObjectSync) {
@@ -74,20 +75,24 @@ func (sctl *SyncController) manageObject(sync *v1alpha1.ObjectSync) {
 func sendEvents(err error, nodeName string, sync *v1alpha1.ObjectSync, resourceType string,
 	objectResourceVersion string, obj interface{}) {
 	runtimeObj := obj.(runtime.Object)
-	if err := util.SetMetaType(runtimeObj); err != nil {
+	if err := metautil.SetMetaType(runtimeObj); err != nil {
 		klog.Warningf("failed to set metatype :%v", err)
 	}
 	if err != nil && apierrors.IsNotFound(err) {
 		//trigger the delete event
 		klog.Infof("%s: %s has been deleted in K8s, send the delete event to edge", resourceType, sync.Spec.ObjectName)
 		source := strings.Split(sync.Labels["source"], ",")
-		if IsExist(source, modules.DynamicControllerModuleName) {
+		if util.IsExist(source, modules.DynamicControllerModuleName) {
 			msg := buildDynamicControllerMessage(nodeName, sync.Namespace, resourceType, sync.Spec.ObjectName, model.DeleteOperation, obj)
-			beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			if msg != nil {
+				beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			}
 		}
-		if IsExist(source, modules.EdgeControllerModuleName) {
+		if util.IsExist(source, modules.EdgeControllerModuleName) {
 			msg := buildEdgeControllerMessage(nodeName, sync.Namespace, resourceType, sync.Spec.ObjectName, model.DeleteOperation, obj)
-			beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			if msg != nil {
+				beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			}
 		}
 		return
 	}
@@ -101,13 +106,17 @@ func sendEvents(err error, nodeName string, sync *v1alpha1.ObjectSync, resourceT
 		// trigger the update event
 		klog.V(4).Infof("The resourceVersion: %s of %s in K8s is greater than in edgenode: %s, send the update event", objectResourceVersion, resourceType, sync.Status.ObjectResourceVersion)
 		source := strings.Split(sync.Labels["source"], ",")
-		if IsExist(source, modules.DynamicControllerModuleName) {
+		if util.IsExist(source, modules.DynamicControllerModuleName) {
 			msg := buildDynamicControllerMessage(nodeName, sync.Namespace, resourceType, sync.Spec.ObjectName, model.UpdateOperation, obj)
-			beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			if msg != nil {
+				beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			}
 		}
-		if IsExist(source, modules.EdgeControllerModuleName) {
+		if util.IsExist(source, modules.EdgeControllerModuleName) {
 			msg := buildEdgeControllerMessage(nodeName, sync.Namespace, resourceType, sync.Spec.ObjectName, model.UpdateOperation, obj)
-			beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			if msg != nil {
+				beehiveContext.Send(commonconst.DefaultContextSendModuleName, *msg)
+			}
 		}
 	}
 }
@@ -182,13 +191,4 @@ func CompareResourceVersion(rva, rvb string) int {
 		return 0
 	}
 	return -1
-}
-
-func IsExist(source []string, msgSource string) bool {
-	for _, s := range source {
-		if s == msgSource {
-			return true
-		}
-	}
-	return false
 }

@@ -30,7 +30,8 @@ import (
 	edgemessagelayer "github.com/kubeedge/kubeedge/cloud/pkg/edgecontroller/messagelayer"
 	"github.com/kubeedge/kubeedge/cloud/pkg/synccontroller"
 	"github.com/kubeedge/kubeedge/common/constants"
-	"github.com/kubeedge/kubeedge/pkg/metaserver/util"
+	metautil "github.com/kubeedge/kubeedge/pkg/metaserver/util"
+	"github.com/kubeedge/kubeedge/pkg/util"
 	"github.com/kubeedge/viaduct/pkg/conn"
 	"github.com/kubeedge/viaduct/pkg/mux"
 )
@@ -511,15 +512,6 @@ func (mh *MessageHandle) send(hi hubio.CloudHubIO, info *model.HubInfo, msg *bee
 	return nil
 }
 
-func IsExist(source []string, msgSource string) bool {
-	for _, s := range source {
-		if s == msgSource {
-			return true
-		}
-	}
-	return false
-}
-
 func (mh *MessageHandle) saveSuccessPoint(msg *beehiveModel.Message, info *model.HubInfo, nodeStore cache.Store) {
 	if msg.GetGroup() == edgeconst.GroupResource {
 		resourceNamespace, _ := edgemessagelayer.GetNamespace(*msg)
@@ -546,7 +538,7 @@ func (mh *MessageHandle) saveSuccessPoint(msg *beehiveModel.Message, info *model
 		if err == nil {
 			// Update objectSync.Label
 			source := strings.Split(objectSync.Labels["source"], ",")
-			if !IsExist(source, msg.GetSource()) {
+			if !util.IsExist(source, msg.GetSource()) {
 				newLabel := strings.Join([]string{objectSync.Labels["source"], msg.GetSource()}, ",")
 				objectSync.Labels["source"] = newLabel
 			}
@@ -566,8 +558,8 @@ func (mh *MessageHandle) saveSuccessPoint(msg *beehiveModel.Message, info *model
 					Labels: label,
 				},
 				Spec: v1alpha1.ObjectSyncSpec{
-					ObjectAPIVersion: util.GetMessageAPIVerison(msg),
-					ObjectKind:       util.GetMessageResourceType(msg),
+					ObjectAPIVersion: metautil.GetMessageAPIVerison(msg),
+					ObjectKind:       metautil.GetMessageResourceType(msg),
 					ObjectName:       resourceName,
 				},
 			}
@@ -595,7 +587,8 @@ func (mh *MessageHandle) saveSuccessPoint(msg *beehiveModel.Message, info *model
 }
 
 func (mh *MessageHandle) deleteSuccessPoint(resourceNamespace, objectSyncName string) {
-	if err := mh.crdClient.ReliablesyncsV1alpha1().ObjectSyncs(resourceNamespace).Delete(context.Background(), objectSyncName, *metav1.NewDeleteOptions(0)); err != nil {
+	err := mh.crdClient.ReliablesyncsV1alpha1().ObjectSyncs(resourceNamespace).Delete(context.Background(), objectSyncName, *metav1.NewDeleteOptions(0))
+	if err != nil && !apierrors.IsNotFound(err) {
 		klog.Errorf("Delete Success Point failed with error: %v", err)
 	}
 }
