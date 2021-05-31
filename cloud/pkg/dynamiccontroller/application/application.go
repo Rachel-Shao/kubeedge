@@ -28,6 +28,7 @@ import (
 	"github.com/kubeedge/kubeedge/cloud/pkg/dynamiccontroller/messagelayer"
 	"github.com/kubeedge/kubeedge/edge/pkg/common/message"
 	"github.com/kubeedge/kubeedge/edge/pkg/edgehub"
+	metaserverconfig "github.com/kubeedge/kubeedge/edge/pkg/metamanager/metaserver/config"
 	"github.com/kubeedge/kubeedge/pkg/metaserver"
 )
 
@@ -268,9 +269,9 @@ var defaultAgent *Agent
 var once sync.Once
 
 // edged config.Config.HostnameOverride
-func NewApplicationAgent(nodeName string) *Agent {
+func NewApplicationAgent() *Agent {
 	once.Do(func() {
-		defaultAgent := Agent{nodeName: nodeName}
+		defaultAgent := Agent{nodeName: metaserverconfig.Config.NodeName}
 		go wait.Until(func() {
 			defaultAgent.GC()
 		}, time.Minute*5, beehiveContext.Done())
