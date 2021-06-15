@@ -37,7 +37,7 @@ var _ = Describe("Test MetaServer", func() {
 				"Get Core Cluster-Scope API with extra segment": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo/baz", http.StatusNotFound},
 				"Watch Core Cluster-Scope API": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes?watch=true", http.StatusOK},
 				"Watch Core Cluster-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/foo?watch=true", http.StatusNotFound},
-				"Patch Core Cluster-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo", http.StatusNotFound},
+				"Patch Core Cluster-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusMethodNotAllowed},
 				"Delete Core Cluster-Scope API bad request": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusBadRequest},
 				"Delete Core Cluster-Scope API with extra segment": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo/baz", http.StatusNotFound},
 
@@ -52,7 +52,7 @@ var _ = Describe("Test MetaServer", func() {
 				"Get Core Namespace-Scope API with extra segment": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo/baz", http.StatusNotFound},
 				"Watch Core Namespace-Scope API": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods?watch=true", http.StatusOK},
 				"Watch Core Namespace-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespces/ns/foo?watch=true", http.StatusNotFound},
-				"Patch Core Namespace-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo", http.StatusNotFound},
+				"Patch Core Namespace-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods", http.StatusMethodNotAllowed},
 				"Delete Core Namespace-Scope API with extra segment": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo/baz", http.StatusNotFound},
 
 				"List Namespace-Scope API":      {"GET", "/" + prefix + "/apps/v1/namespaces/ns-foo/jobs", http.StatusOK},
