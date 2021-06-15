@@ -30,7 +30,6 @@ var _ = Describe("Test MetaServer", func() {
 			cases := map[string]T{
 				// Positive checks to make sure everything is wired correctly
 				// Cluster-Scope API
-				"List long prefix":	{"GET", "/" + coreAPIPrefix + "/", http.StatusNotFound},
 				"List Core Cluster-Scope API":   {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusOK},
 				"List Core Cluster-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/foo", http.StatusOK},
 				"Get Core Cluster-Scope API":   {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo", http.StatusNotFound},
