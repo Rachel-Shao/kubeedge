@@ -1,6 +1,7 @@
 package metaserver
 
 import (
+	"github.com/kubeedge/kubeedge/edge/test/integration/utils/common"
 	"net/http"
 
 	. "github.com/onsi/ginkgo"
@@ -35,7 +36,6 @@ var _ = Describe("Test MetaServer", func() {
 				"Get Core Cluster-Scope API":   {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo", http.StatusNotFound},
 				"Get Core Cluster-Scope API with extra segment": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo/baz", http.StatusNotFound},
 				"Watch Core Cluster-Scope API": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes?watch=true", http.StatusOK}, //?
-				"Watch Core Cluster-Scope API with bad method": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/watch/nodes", http.StatusMethodNotAllowed},//?
 				"Watch Core Cluster-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/foo?watch=true", http.StatusNotFound},
 				"Patch Core Cluster-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusMethodNotAllowed}, //?
 				"Delete Core Cluster-Scope API list": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusMethodNotAllowed}, //？
@@ -67,6 +67,7 @@ var _ = Describe("Test MetaServer", func() {
 			client := http.Client{}
 			url := "http://127.0.0.1:10550"
 			for _, v := range cases {
+				common.Infof("%s %s", v.Method, v.Path)
 				request, err := http.NewRequest(v.Method, url+v.Path, nil)
 				Expect(err).Should(BeNil())
 				response, err := client.Do(request)
