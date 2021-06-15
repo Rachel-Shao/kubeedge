@@ -35,7 +35,7 @@ var _ = Describe("Test MetaServer", func() {
 				"Get Core Cluster-Scope API":   {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo", http.StatusNotFound},
 				"Get Core Cluster-Scope API with extra segment": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo/baz", http.StatusNotFound},
 				"Watch Core Cluster-Scope API": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes?watch=true", http.StatusOK},
-				"Watch Core Cluster-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/foo?watch=true", http.StatusNotFound},
+				"Watch Core Cluster-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/foo?watch=true", http.StatusOK},
 				"Patch Core Cluster-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusBadRequest},
 				"Delete Core Cluster-Scope API bad request": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusInternalServerError},
 
