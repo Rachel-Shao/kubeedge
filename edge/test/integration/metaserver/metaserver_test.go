@@ -39,7 +39,6 @@ var _ = Describe("Test MetaServer", func() {
 				"Watch Core Cluster-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/foo?watch=true", http.StatusNotFound},
 				"Patch Core Cluster-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo", http.StatusNotFound},
 				"Delete Core Cluster-Scope API bad request": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes", http.StatusBadRequest},
-				"Delete Core Cluster-Scope API": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo", http.StatusNotFound},
 				"Delete Core Cluster-Scope API with extra segment": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/nodes/node-foo/baz", http.StatusNotFound},
 
 				"List Cluster-Scope API":        {"GET", "/" + prefix + "/apiextensions.k8s.io/v1beta1/customresourcedefinitions", http.StatusOK},
@@ -54,8 +53,7 @@ var _ = Describe("Test MetaServer", func() {
 				"Watch Core Namespace-Scope API": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods?watch=true", http.StatusOK},
 				"Watch Core Namespace-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespces/ns/foo?watch=true", http.StatusNotFound},
 				"Patch Core Namespace-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo", http.StatusNotFound},
-				//"Delete Core Namespace-Scope API": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo", http.StatusNotFound},
-				//"Delete Core Namespace-Scope API with extra segment": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo/baz", http.StatusNotFound},
+				"Delete Core Namespace-Scope API with extra segment": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo/baz", http.StatusNotFound},
 
 				"List Namespace-Scope API":      {"GET", "/" + prefix + "/apps/v1/namespaces/ns-foo/jobs", http.StatusOK},
 				"Get Namespace-Scope API":      {"GET", "/" + prefix + "/apps/v1/namespaces/ns-foo/jobs/job-foo", http.StatusNotFound},
