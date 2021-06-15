@@ -49,7 +49,7 @@ var _ = Describe("Test MetaServer", func() {
 				"Get Core Namespace-Scope API": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo", http.StatusNotFound},
 				"Get Core Namespace-Scope API with extra segment": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo/baz", http.StatusNotFound},
 				"Watch Core Namespace-Scope API": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods?watch=true", http.StatusOK},
-				"Watch Core Namespace-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespces/ns/foo?watch=true", http.StatusNotFound},
+				"Watch Core Namespace-Scope API missing storage": {"GET", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/foo?watch=true", http.StatusOK},
 				"Patch Core Namespace-Scope API": {"PATCH", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods", http.StatusBadRequest},
 				"Delete Core Namespace-Scope API with extra segment": {"DELETE", "/" + coreAPIPrefix + "/" + coreAPIGroupVersion.Version + "/namespaces/ns/pods/pod-foo/baz", http.StatusInternalServerError},
 
