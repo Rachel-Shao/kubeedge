@@ -20,15 +20,12 @@ import (
 	"net/http"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/util/intstr"
-
 	"github.com/kubeedge/kubeedge/edge/test/integration/utils/common"
 	"github.com/kubeedge/kubeedge/edge/test/integration/utils/edge"
 	. "github.com/kubeedge/kubeedge/edge/test/integration/utils/helpers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	v1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -58,6 +55,7 @@ var _ = Describe("Application deployment in edgecore Testing", func() {
 			CheckPodRunningState(ctx.Cfg.EdgedEndpoint+AppHandler, UID)
 		})
 
+		/*
 		It("TC_TEST_APP_DEPLOYMENT_2: Test List application deployment in edgecore", func() {
 			//Generate the random string and assign as a UID
 			UID = "deployment-app-" + edge.GetRandomString(10)
@@ -284,5 +282,7 @@ var _ = Describe("Application deployment in edgecore Testing", func() {
 			Expect(IsAppDeleted).Should(BeTrue())
 			CheckPodDeletion(ctx.Cfg.EdgedEndpoint+AppHandler, UID)
 		})
+
+		 */
 	})
 })
