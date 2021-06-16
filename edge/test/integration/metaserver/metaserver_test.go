@@ -46,6 +46,7 @@ var _ = Describe("Test MetaServer", func() {
 			url := "http://127.0.0.1:10550"
 			for _, v := range cases {
 				request, err := http.NewRequest(v.Method, url+v.Path, nil)
+				request.Close = true
 				Expect(err).Should(BeNil())
 				response, err := client.Do(request)
 				Expect(err).Should(BeNil())
