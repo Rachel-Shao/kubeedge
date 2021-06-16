@@ -271,12 +271,10 @@ var once sync.Once
 // edged config.Config.HostnameOverride
 func NewApplicationAgent() *Agent {
 	defaultAgent := &Agent{nodeName: metaserverconfig.Config.NodeName}
-
 	once.Do(func() {
 		go wait.Until(func() {
 			defaultAgent.GC()
 		}, time.Minute*5, beehiveContext.Done())
-
 	})
 	return defaultAgent
 }
@@ -351,7 +349,6 @@ func (a *Agent) doApply(app *Application) {
 }
 
 func (a *Agent) GC() {
-	/*
 	a.Applications.Range(func(key, value interface{}) bool {
 		app := value.(*Application)
 		lastCloseTime := app.LastCloseTime()
@@ -360,8 +357,6 @@ func (a *Agent) GC() {
 		}
 		return true
 	})
-
-	 */
 }
 
 type Center struct {
