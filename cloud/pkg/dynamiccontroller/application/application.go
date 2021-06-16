@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	metaserverconfig "github.com/kubeedge/kubeedge/edge/pkg/metamanager/metaserver/config"
-	"k8s.io/apimachinery/pkg/util/wait"
+	//"k8s.io/apimachinery/pkg/util/wait"
 	"sync"
 	"time"
 
