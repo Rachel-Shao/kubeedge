@@ -272,9 +272,13 @@ var once sync.Once
 func NewApplicationAgent() *Agent {
 	once.Do(func() {
 		defaultAgent := Agent{nodeName: metaserverconfig.Config.NodeName}
+		/*
 		go wait.Until(func() {
 			defaultAgent.GC()
 		}, time.Minute*5, beehiveContext.Done())
+
+		 */
+		klog.Infof("%s", defaultAgent.nodeName)
 	})
 	return defaultAgent
 }
