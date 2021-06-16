@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	metaserverconfig "github.com/kubeedge/kubeedge/edge/pkg/metamanager/metaserver/config"
-	//"k8s.io/apimachinery/pkg/util/wait"
 	"sync"
 	"time"
 
@@ -18,6 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/klog/v2"
@@ -29,6 +28,7 @@ import (
 	"github.com/kubeedge/kubeedge/cloud/pkg/dynamiccontroller/messagelayer"
 	"github.com/kubeedge/kubeedge/edge/pkg/common/message"
 	"github.com/kubeedge/kubeedge/edge/pkg/edgehub"
+	metaserverconfig "github.com/kubeedge/kubeedge/edge/pkg/metamanager/metaserver/config"
 	"github.com/kubeedge/kubeedge/pkg/metaserver"
 )
 
@@ -270,15 +270,13 @@ var once sync.Once
 
 // edged config.Config.HostnameOverride
 func NewApplicationAgent() *Agent {
+	defaultAgent := &Agent{nodeName: metaserverconfig.Config.NodeName}
+
 	once.Do(func() {
-		defaultAgent := Agent{nodeName: metaserverconfig.Config.NodeName}
-		/*
 		go wait.Until(func() {
 			defaultAgent.GC()
 		}, time.Minute*5, beehiveContext.Done())
 
-		 */
-		klog.Infof("%s", defaultAgent.nodeName)
 	})
 	return defaultAgent
 }
