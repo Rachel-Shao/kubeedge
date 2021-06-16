@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	metaserverconfig "github.com/kubeedge/kubeedge/edge/pkg/metamanager/metaserver/config"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"sync"
 	"time"
 
@@ -267,10 +269,7 @@ var defaultAgent *Agent
 var once sync.Once
 
 // edged config.Config.HostnameOverride
-func NewApplicationAgent(nodeName string) *Agent {
-	return &Agent{nodeName: nodeName}
-
-	/*
+func NewApplicationAgent() *Agent {
 	once.Do(func() {
 		defaultAgent := Agent{nodeName: metaserverconfig.Config.NodeName}
 		go wait.Until(func() {
@@ -278,8 +277,6 @@ func NewApplicationAgent(nodeName string) *Agent {
 		}, time.Minute*5, beehiveContext.Done())
 	})
 	return defaultAgent
-
-	 */
 }
 
 func (a *Agent) Generate(ctx context.Context, verb applicationVerb, option interface{}, obj runtime.Object) *Application {
