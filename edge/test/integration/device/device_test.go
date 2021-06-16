@@ -18,9 +18,6 @@ package device_test
 
 import (
 	"encoding/json"
-	"net/http"
-	"strings"
-
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	_ "github.com/mattn/go-sqlite3"
 	. "github.com/onsi/ginkgo"
@@ -125,6 +122,8 @@ var _ = Describe("Event Bus Testing", func() {
 			Expect(TokenClient.Error()).NotTo(HaveOccurred())
 
 		})
+
+		/*
 
 		It("TC_TEST_EBUS_2: Sending data to device module", func() {
 			var data = "messagetoDevice_status_update"
@@ -412,5 +411,7 @@ var _ = Describe("Event Bus Testing", func() {
 			}, "60s", "2s").Should(Equal("100.100"), "Device Twin Attributes are not Added within specified time")
 
 		})
+
+		 */
 	})
 })
