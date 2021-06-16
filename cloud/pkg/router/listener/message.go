@@ -3,6 +3,7 @@ package listener
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"sync"
 
@@ -53,14 +54,21 @@ func (mh *MessageHandler) getHandler(source string, resource string) (Handle, er
 
 func Process(module string) {
 	for {
-		if msg, err := beehiveContext.Receive(module); err == nil {
-			klog.Infof("get a message, header:%+v router:%+v", msg.Header, msg.Router)
-			err = MessageHandlerInstance.HandleMessage(&msg)
-			if err != nil {
-				klog.Errorf("Process msg error: %s.", err.Error())
-			}
-		} else {
+		select {
+		case <-beehiveContext.Done():
+			klog.Info("router module stop dispatch message")
+			return
+		default:
+		}
+		msg, err := beehiveContext.Receive(module)
+		if err != nil {
 			klog.Errorf("get a message, header:%+v router:%+v, err: %v", msg.Header, msg.Router, err)
+			continue
+		}
+		klog.Infof("get a message, header:%+v router:%+v", msg.Header, msg.Router)
+		err = MessageHandlerInstance.HandleMessage(&msg)
+		if err != nil {
+			klog.Errorf("Process msg error: %s.", err.Error())
 		}
 	}
 }
@@ -76,9 +84,14 @@ func (mh *MessageHandler) HandleMessage(message *model.Message) error {
 		return err
 	}
 	go func(message *model.Message) {
-		_, err := handler(message)
+		resp, err := handler(message)
 		if err != nil {
 			klog.Errorf("handle message occur error, msgID: %s, reason: %s", message.GetID(), err.Error())
+		}
+		if resp != nil {
+			if err = resp.(*http.Response).Body.Close(); err != nil {
+				klog.Errorf("close response occur error, msgID: %s, reason: %s", message.GetID(), err.Error())
+			}
 		}
 	}(message)
 
