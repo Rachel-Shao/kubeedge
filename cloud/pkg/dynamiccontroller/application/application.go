@@ -16,7 +16,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/klog/v2"
@@ -28,7 +27,6 @@ import (
 	"github.com/kubeedge/kubeedge/cloud/pkg/dynamiccontroller/messagelayer"
 	"github.com/kubeedge/kubeedge/edge/pkg/common/message"
 	"github.com/kubeedge/kubeedge/edge/pkg/edgehub"
-	metaserverconfig "github.com/kubeedge/kubeedge/edge/pkg/metamanager/metaserver/config"
 	"github.com/kubeedge/kubeedge/pkg/metaserver"
 )
 
@@ -97,7 +95,7 @@ type Application struct {
 
 	count     uint64 // count the number of current citations
 	countLock sync.Mutex
-	tim       time.Time // record the last closing time of application, only make sense when count == 0
+	//tim       time.Time // record the last closing time of application, only make sense when count == 0
 	//TODO: add lock
 }
 
@@ -123,7 +121,7 @@ func newApplication(ctx context.Context, key string, verb applicationVerb, noden
 		cancel:    cancel,
 		count:     0,
 		countLock: sync.Mutex{},
-		tim:       time.Time{},
+		//tim:       time.Time{},
 	}
 	app.add()
 	return app
@@ -243,13 +241,13 @@ func (a *Application) Close() {
 		return
 	}
 
-	a.tim = time.Now()
+	//a.tim = time.Now()
 	a.count--
 	if a.count == 0 {
 		a.Status = Completed
 	}
 }
-
+/*
 func (a *Application) LastCloseTime() time.Time {
 	a.countLock.Lock()
 	defer a.countLock.Unlock()
@@ -259,6 +257,8 @@ func (a *Application) LastCloseTime() time.Time {
 	return time.Time{}
 }
 
+
+ */
 // used for generating application and do apply
 type Agent struct {
 	Applications sync.Map //store struct application
@@ -269,7 +269,10 @@ var defaultAgent *Agent
 var once sync.Once
 
 // edged config.Config.HostnameOverride
-func NewApplicationAgent() *Agent {
+func NewApplicationAgent(nodeName string) *Agent {
+	return &Agent{nodeName: nodeName}
+
+	/*
 	once.Do(func() {
 		defaultAgent := Agent{nodeName: metaserverconfig.Config.NodeName}
 		go wait.Until(func() {
@@ -277,6 +280,8 @@ func NewApplicationAgent() *Agent {
 		}, time.Minute*5, beehiveContext.Done())
 	})
 	return defaultAgent
+
+	 */
 }
 
 func (a *Agent) Generate(ctx context.Context, verb applicationVerb, option interface{}, obj runtime.Object) *Application {
@@ -328,7 +333,7 @@ func (a *Agent) doApply(app *Application) {
 	app.Status = InApplying
 	msg := model.NewMessage("").SetRoute(MetaServerSource, modules.DynamicControllerModuleGroup).FillBody(app)
 	msg.SetResourceOperation("null", "null")
-	resp, err := beehiveContext.SendSync(edgehub.ModuleNameEdgeHub, *msg, 30*time.Second)
+	resp, err := beehiveContext.SendSync(edgehub.ModuleNameEdgeHub, *msg, 10*time.Second)
 	if err != nil {
 		app.Status = Failed
 		app.Reason = fmt.Sprintf("failed to access cloud Application center: %v", err)
@@ -349,6 +354,7 @@ func (a *Agent) doApply(app *Application) {
 }
 
 func (a *Agent) GC() {
+	/*
 	a.Applications.Range(func(key, value interface{}) bool {
 		app := value.(*Application)
 		lastCloseTime := app.LastCloseTime()
@@ -357,6 +363,8 @@ func (a *Agent) GC() {
 		}
 		return true
 	})
+
+	 */
 }
 
 type Center struct {

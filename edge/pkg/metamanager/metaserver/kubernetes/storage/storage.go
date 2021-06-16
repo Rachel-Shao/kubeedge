@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"encoding/json"
+	metaserverconfig "github.com/kubeedge/kubeedge/edge/pkg/metamanager/metaserver/config"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
@@ -61,7 +62,7 @@ func NewREST() (*REST, error) {
 	store.Storage.Storage = sqlite.New()
 	store.Storage.Codec = unstructured.UnstructuredJSONScheme
 
-	return &REST{store, application.NewApplicationAgent()}, nil
+	return &REST{store, application.NewApplicationAgent(metaserverconfig.Config.NodeName)}, nil
 }
 
 // decorateList set list's gvk if it's gvk is empty
