@@ -328,11 +328,7 @@ func (m *metaManager) processUpdate(message model.Message) {
 		resp := message.NewRespByMessage(&message, OK)
 		sendToEdged(resp, message.IsSync())
 	case cloudmodules.EdgeControllerModuleName:
-		if isEdgeMeshResource(resType) {
-			sendToEdgeMesh(&message, message.IsSync())
-		} else {
-			sendToEdged(&message, message.IsSync())
-		}
+		sendToEdged(&message, message.IsSync())
 		resp := message.NewRespByMessage(&message, OK)
 		sendToCloud(resp)
 	case CloudFunctionModel:
