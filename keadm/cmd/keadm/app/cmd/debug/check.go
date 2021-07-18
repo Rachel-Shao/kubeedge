@@ -30,9 +30,6 @@ and maintenance personnel to locate the problem`
         # Check all items .
         keadm debug check all
 
-        # Check whether the node arch is supported .
-        keadm debug check arch
-
         # Check whether the node CPU meets  requirements.
         keadm debug check cpu
 
@@ -288,11 +285,10 @@ func CheckNetWork(IP string, timeout int, cloudhubServer string, edgecoreServer 
 	if config != "" {
 		edgeConfig, err := util.ParseEdgecoreConfig(config)
 		if err != nil {
-			err = fmt.Errorf("parse Edgecore config failed")
-		} else {
-			if cloudhubServer == "" {
-				cloudhubServer = edgeConfig.Modules.EdgeHub.WebSocket.Server
-			}
+			return fmt.Errorf("parse Edgecore config failed")
+		}
+		if cloudhubServer == "" {
+			cloudhubServer = edgeConfig.Modules.EdgeHub.WebSocket.Server
 		}
 	}
 
@@ -326,7 +322,7 @@ func CheckNetWork(IP string, timeout int, cloudhubServer string, edgecoreServer 
 	if edgecoreServer != "" {
 		err := CheckHTTP("http://" + edgecoreServer)
 		if err != nil {
-			return fmt.Errorf("check edgecoreServer %s failed, %v", edgecoreServer, edgecoreServer)
+			return fmt.Errorf("check edgecoreServer %s failed, %v", edgecoreServer, err)
 		}
 		fmt.Printf("check edgecoreServer %s success\n", edgecoreServer)
 	}
